@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Сергей Никурашвили](https://up.htmlacademy.ru/javascript/18/user/974273).
-* Наставник: `Неизвестно`.
+* Наставник: [Кексобот].
 
 ---
 
