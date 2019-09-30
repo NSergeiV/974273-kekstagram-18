@@ -65,3 +65,44 @@ var creatingCopies = function () {
 };
 
 creatingCopies();
+
+// Показ фотографии в увеличенном виде (первую)
+
+var bigFoto = function () {
+  var bigPicture = document.querySelector('.big-picture');
+  bigPicture.classList.remove('hidden');
+
+  var bigPictureImg = bigPicture.querySelector('.big-picture__img');
+  var bigImg = bigPictureImg.querySelector('img');
+  var bigPictureLikesCount = bigPicture.querySelector('.likes-count');
+  var bigPictureSocialCommentCount = bigPicture.querySelector('.social__comment-count');
+  var bigPictureComments = bigPicture.querySelector('.comments-count');
+  var bigPictureSocialComments = bigPicture.querySelector('.social__comments');
+  var socialCommentItemBigPicture = document.querySelector('.social__comment');
+  var socialCommentItemPicture = socialCommentItemBigPicture.querySelector('.social__picture');
+  var socialCommentItemText = socialCommentItemBigPicture.querySelector('.social__text');
+  var allCommentBigPucture = bigPictureSocialComments.querySelectorAll('li');
+  var socialHeaderBigPicture = bigPicture.querySelector('.social__header');
+  var descriptionBigPicture = socialHeaderBigPicture.querySelector('.social__caption');
+  var buttonCommentsLoader = bigPicture.querySelector('.comments-loader');
+  bigPictureSocialComments.removeChild(allCommentBigPucture[0]);
+  bigPictureSocialComments.removeChild(allCommentBigPucture[1]);
+
+  descriptionBigPicture.textContent = usersPhotos[0].description;
+  bigImg.src = usersPhotos[0].url;
+  bigPictureLikesCount.textContent = usersPhotos[0].likes;
+  bigPictureComments.textContent = usersPhotos[0].comments.length;
+  bigPictureSocialCommentCount.classList.add('visually-hidden');
+  buttonCommentsLoader.classList.add('visually-hidden');
+
+  for (var e = 0; e < usersPhotos[0].comments.length; e++) {
+    socialCommentItemPicture.src = usersPhotos[0].comments[e].avatar;
+    socialCommentItemText.textContent = usersPhotos[0].comments[e].message;
+
+    var wizardElement = socialCommentItemBigPicture.cloneNode(true);
+    bigPictureSocialComments.appendChild(wizardElement);
+  }
+
+};
+
+bigFoto();
