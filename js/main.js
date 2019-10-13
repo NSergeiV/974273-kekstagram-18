@@ -1,5 +1,7 @@
 'use strict';
 
+// Отображение похожих объявлений и фотографий других пользователей
+
 var usersPhotos = [];
 var commentsToPhotos = ['Всё отлично!', 'В целом всё неплохо. Но не всё.', 'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.', 'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.', 'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.', 'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'];
 var namesAvatars = ['Артем', 'Василий', 'Николай', 'Александор', 'Олег', 'Тимофовей'];
@@ -66,11 +68,11 @@ var creatingCopies = function () {
 
 creatingCopies();
 
-// Показ фотографии в увеличенном виде (первую)
+// Показ фотографии в увеличенном виде (превью)
 
 var bigFoto = function () {
   var bigPicture = document.querySelector('.big-picture');
-  bigPicture.classList.remove('hidden');
+  // bigPicture.classList.remove('hidden');
 
   var bigPictureImg = bigPicture.querySelector('.big-picture__img');
   var bigImg = bigPictureImg.querySelector('img');
@@ -102,7 +104,162 @@ var bigFoto = function () {
     var wizardElement = socialCommentItemBigPicture.cloneNode(true);
     bigPictureSocialComments.appendChild(wizardElement);
   }
-
 };
 
 bigFoto();
+
+// Загрузка и закрытие попапа изображения
+
+var iconFotoDownload = document.querySelector('#upload-file');
+var imageEditingForm = document.querySelector('.img-upload__overlay');
+var imageEditingFormButtonClose = document.querySelector('#upload-cancel');
+var buttonTransformEfftctImage = document.querySelector('.effect-level__pin');
+var hashTagsFoImage = document.querySelector('input[name="hashtags"]');
+
+var KEY_ESC = 27;
+var KEY_ENTER = 13;
+
+var onImageEditingFormCloseEsc = function (evt) {
+  if (evt.keyCode === KEY_ESC) {
+    if (hashTagsFoImage !== document.activeElement) {
+      onImageEditingFormClose();
+    }
+  }
+};
+
+var onImageEditingFormOpen = function () {
+  imageEditingForm.classList.remove('hidden');
+  document.addEventListener('keydown', onImageEditingFormCloseEsc);
+};
+
+var onImageEditingFormClose = function () {
+  imageEditingForm.classList.add('hidden');
+  document.removeEventListener('keydown', onImageEditingFormCloseEsc);
+  document.querySelector('input[name="filename"]').value = null;
+};
+
+var onHashTagsFoImageFocusNotSubmit = function (evt) {
+  if (hashTagsFoImage === document.activeElement) {
+    if (evt.keyCode === KEY_ENTER) {
+      evt.preventDefault();
+    }
+  }
+};
+
+iconFotoDownload.addEventListener('change', onImageEditingFormOpen);
+imageEditingFormButtonClose.addEventListener('click', onImageEditingFormClose);
+
+// Валидация формы отправки хеш-тегов к фотографии
+
+document.addEventListener('keydown', onHashTagsFoImageFocusNotSubmit, false);
+hashTagsFoImage.addEventListener('input', function (evt) {
+  var input = evt.target;
+  // var arr1 = input.value.split('');
+  var arr2 = input.value.split('#');
+
+  // Перебираем и ищим заданный элемент
+  var countingSymbols = function (symbol) {
+    return input.value.match(symbol);
+  };
+
+  // Создаем массив и разделяем на хеш-теги для проверки валидации
+  var shortArrayHashtags = function (shortHashTag) {
+
+    var re = shortHashTag;
+    var option = true;
+
+    for (var b = 1; b < arr2.length; b++) {
+      var elem = arr2[b];
+      if (!elem.match(re)) {
+        option = false;
+      }
+    }
+    return option;
+  };
+
+  var spaceInHashtags = function (space) {
+    var re = space;
+    var option = true;
+    for (var b = 1; b < arr2.length; b++) {
+      var elem = arr2[b];
+      if (re.test(elem)) {
+        option = false;
+      }
+    }
+    return option;
+  };
+  // Проверяет в массиве каждый хеш-тег на максимальное количество символов
+  var longArrayHashtags = function (longHashTag) {
+    var value = true;
+    for (var b = 1; b < arr2.length; b++) {
+      var elem = arr2[b].replace(/\s/g, '');
+      var arrSplit = elem.split('');
+      if (longHashTag < arrSplit.length) {
+        value = false;
+      }
+    }
+    return value;
+  };
+
+  // Это поиск похожих хеш-тегов
+  var cloneArrayHashtags = function () {
+    var option = true;
+    for (var c = 1; c < arr2.length; c++) {
+      var re = /(\w+)\s/;
+      var element1 = arr2[c].replace(re, '$1');
+      for (var d = c + 1; d < arr2.length; d++) {
+        var ree = /(\w+)\s?/;
+        var element2 = arr2[d].replace(ree, '$1');
+        if (element1.toLowerCase() === element2.toLowerCase()) {
+          option = false;
+        }
+      }
+    }
+
+    return option;
+  };
+
+  if (!input.value.match(/^#\w+/g)) {
+    input.setCustomValidity('В начале хеш-тега должна стаять - # или не хватает символа');
+  } else {
+    if (countingSymbols(/#/g).length === 1) {
+      if (!input.value.match(/^#/g)) {
+        input.setCustomValidity('В начале хеш-тега должно стаять - #');
+      } else if (!input.value.match(/^#\w+/g)) {
+        input.setCustomValidity('Хеш-тег меньше двух символов');
+      } else if (input.value.match(/\w+\s\w+/g)) {
+        input.setCustomValidity('Хеш-тег не может содержать пробелов');
+      } else if (countingSymbols(/\w/g).length > 20) {
+        input.setCustomValidity('Хеш-тег не может быть длиннее 20 символов.');
+      } else {
+        input.setCustomValidity('');
+      }
+    } else {
+      if (input.value.match(/##/g)) {
+        input.setCustomValidity('Разделите ##');
+      } else if (input.value.match(/\w+#/g)) {
+        input.setCustomValidity('Хеш-теги не разделены пробелами');
+      } else if (countingSymbols(/#/g).length > 5) {
+        input.setCustomValidity('Хеш-тегов не может быть больше пяти.');
+      } else if (shortArrayHashtags(/(\w+)/g) === false) {
+        input.setCustomValidity('Хеш-тег не может состоять из одной #');
+      } else if (spaceInHashtags(/(\s\w)(?:\s$)?/g) === false) {
+        input.setCustomValidity('Хеш-тег пробел');
+      } else if (longArrayHashtags(19) === false) {
+        input.setCustomValidity('Хеш-тег не может состоять больше 20 символов.');
+      } else if (cloneArrayHashtags() === false) {
+        input.setCustomValidity('У Вас одинаковые хеш-теги.');
+      } else {
+        input.setCustomValidity('');
+      }
+    }
+  }
+});
+
+// Изменение уровня эффекта фотографии
+
+var onButtonTransformEffectImagePosition = function () {
+  buttonTransformEfftctImage.style.left = '100%';
+};
+
+buttonTransformEfftctImage.addEventListener('mouseup', onButtonTransformEffectImagePosition);
