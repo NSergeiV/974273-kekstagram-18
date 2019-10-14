@@ -5,6 +5,12 @@
 var usersPhotos = [];
 var commentsToPhotos = ['Всё отлично!', 'В целом всё неплохо. Но не всё.', 'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.', 'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.', 'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.', 'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'];
 var namesAvatars = ['Артем', 'Василий', 'Николай', 'Александор', 'Олег', 'Тимофовей'];
+var bigPicture = document.querySelector('.big-picture');
+var bigPictureCloseButton = bigPicture.querySelector('.big-picture__cancel');
+var galleryPhotos = document.querySelector('.pictures');
+
+var KEY_ESC = 27;
+var KEY_ENTER = 13;
 
 var randomCase = function (max, min) {
   var math = Math.floor(Math.random() * (max - min) + min);
@@ -51,28 +57,24 @@ fillUsers();
 var creatingCopies = function () {
   var template = document.querySelector('#picture').content.querySelector('.picture');
   var fragment = document.createDocumentFragment();
-  var galleryPhotos = document.querySelector('.pictures');
-
   for (var d = 0; d < usersPhotos.length; d++) {
     template.querySelector('.picture__img').src = usersPhotos[d].url;
     template.querySelector('.picture__likes').textContent = usersPhotos[d].likes;
     template.querySelector('.picture__comments').textContent = usersPhotos[d].comments.length;
-
     var wizardElement = template.cloneNode(true);
-
     fragment.appendChild(wizardElement);
   }
-
   galleryPhotos.appendChild(fragment);
 };
-
 creatingCopies();
 
 // Показ фотографии в увеличенном виде (превью)
 
-var bigFoto = function () {
-  var bigPicture = document.querySelector('.big-picture');
-  // bigPicture.classList.remove('hidden');
+var bigFoto = function (big) {
+  bigPicture.classList.remove('hidden');
+
+  var elementFoto = big.url;
+  var elementPictureLikes = big.likes;
 
   var bigPictureImg = bigPicture.querySelector('.big-picture__img');
   var bigImg = bigPictureImg.querySelector('img');
@@ -90,39 +92,76 @@ var bigFoto = function () {
   bigPictureSocialComments.removeChild(allCommentBigPucture[0]);
   bigPictureSocialComments.removeChild(allCommentBigPucture[1]);
 
-  descriptionBigPicture.textContent = usersPhotos[0].description;
-  bigImg.src = usersPhotos[0].url;
-  bigPictureLikesCount.textContent = usersPhotos[0].likes;
-  bigPictureComments.textContent = usersPhotos[0].comments.length;
+  descriptionBigPicture.textContent = big.description;
+  bigImg.src = elementFoto;
+  bigPictureLikesCount.textContent = elementPictureLikes;
+  bigPictureComments.textContent = big.comments.length;
   bigPictureSocialCommentCount.classList.add('visually-hidden');
   buttonCommentsLoader.classList.add('visually-hidden');
 
-  for (var e = 0; e < usersPhotos[0].comments.length; e++) {
-    socialCommentItemPicture.src = usersPhotos[0].comments[e].avatar;
-    socialCommentItemText.textContent = usersPhotos[0].comments[e].message;
+  for (var e = 0; e < big.comments.length; e++) {
+    socialCommentItemPicture.src = big.comments[e].avatar;
+    socialCommentItemText.textContent = big.comments[e].message;
 
     var wizardElement = socialCommentItemBigPicture.cloneNode(true);
     bigPictureSocialComments.appendChild(wizardElement);
   }
 };
 
-bigFoto();
+// Обработчик события клика по фотографии и вывод ее в большой формат
 
-// Загрузка и закрытие попапа изображения
+var closeBigUserPgotoFocusEsc = function (evt) {
+  if (evt.keyCode === KEY_ESC) {
+    closeBigUserPgoto();
+  }
+};
+
+var openBigUserPgoto = function (evt) {
+  var clicFoto = evt.target.closest('a');
+  var elements = galleryPhotos.querySelectorAll('.picture');
+  for (var b = 0; b < elements.length; b++) {
+    var element = elements[b];
+    if (clicFoto === element) {
+      var elementFotoUrl = element.querySelector('.picture__img').src;
+      var re = /\/[0-9]?[0-9]/g;
+      var elementMatch = elementFotoUrl.match(re);
+      var cloneUrl = elementFotoUrl.replace(elementFotoUrl, 'photos' + elementMatch[0] + '.jpg');
+      for (var c = 0; c < usersPhotos.length; c++) {
+        if (cloneUrl === usersPhotos[c].url) {
+          var infoUserPhoto = usersPhotos[c];
+        }
+      }
+      bigFoto(infoUserPhoto);
+    }
+  }
+
+  document.addEventListener('keydown', closeBigUserPgotoFocusEsc);
+};
+
+var closeBigUserPgoto = function () {
+  bigPicture.classList.add('hidden');
+
+  document.removeEventListener('keydown', closeBigUserPgotoFocusEsc);
+};
+
+galleryPhotos.addEventListener('click', openBigUserPgoto);
+bigPictureCloseButton.addEventListener('click', closeBigUserPgoto);
+
+// Загрузка файла и закрытие попапа редактированя изображения
 
 var iconFotoDownload = document.querySelector('#upload-file');
 var imageEditingForm = document.querySelector('.img-upload__overlay');
 var imageEditingFormButtonClose = document.querySelector('#upload-cancel');
 var buttonTransformEfftctImage = document.querySelector('.effect-level__pin');
 var hashTagsFoImage = document.querySelector('input[name="hashtags"]');
-
-var KEY_ESC = 27;
-var KEY_ENTER = 13;
+var commentFoImage = document.querySelector('textarea[name="description"]');
 
 var onImageEditingFormCloseEsc = function (evt) {
   if (evt.keyCode === KEY_ESC) {
     if (hashTagsFoImage !== document.activeElement) {
-      onImageEditingFormClose();
+      if (commentFoImage !== document.activeElement) {
+        onImageEditingFormClose();
+      }
     }
   }
 };
@@ -149,12 +188,13 @@ var onHashTagsFoImageFocusNotSubmit = function (evt) {
 iconFotoDownload.addEventListener('change', onImageEditingFormOpen);
 imageEditingFormButtonClose.addEventListener('click', onImageEditingFormClose);
 
-// Валидация формы отправки хеш-тегов к фотографии
-
+// !!! Валидация формы отправки хеш-тегов и комментарий к фотографии
+// Отменяет поумолчанию отправку формы на нажатие интера когда поле активно
 document.addEventListener('keydown', onHashTagsFoImageFocusNotSubmit, false);
+
+// Валадация хеш-тегов
 hashTagsFoImage.addEventListener('input', function (evt) {
   var input = evt.target;
-  // var arr1 = input.value.split('');
   var arr2 = input.value.split('#');
 
   // Перебираем и ищим заданный элемент
@@ -256,7 +296,18 @@ hashTagsFoImage.addEventListener('input', function (evt) {
   }
 });
 
-// Изменение уровня эффекта фотографии
+// Валидация поля комментарии к фотографии
+commentFoImage.addEventListener('input', function (evt) {
+  var input = evt.target;
+  var lengthComment = input.value.split('');
+  if (lengthComment.length > 140) {
+    input.setCustomValidity('Комментарии не может состоять больше 140 символов.');
+  } else {
+    input.setCustomValidity('');
+  }
+});
+
+// !!! Изменение уровня эффекта фотографии
 
 var onButtonTransformEffectImagePosition = function () {
   buttonTransformEfftctImage.style.left = '100%';
