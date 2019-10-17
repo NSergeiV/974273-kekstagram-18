@@ -10,3 +10,6 @@
 
   buttonTransformEfftctImage.addEventListener('mouseup', onButtonTransformEffectImagePosition);
 })();
+(function () {
+  var w = 34;
+})();
