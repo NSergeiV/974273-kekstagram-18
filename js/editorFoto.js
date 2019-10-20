@@ -138,7 +138,9 @@
             x: startCoords.x - offsetCoord.x
           };
 
-          startCoords.x = moveEvt.clientX;
+          startCoords = {
+            x: moveEvt.clientX
+          };
 
           buttonTransformEfftctImage.style.left = (buttonTransformEfftctImage.offsetLeft - shift.x) + 'px';
           effectLevelDepth.style.width = Math.floor((buttonTransformEfftctImage.offsetLeft - shift.x) / (453 / 100)) + '%';
@@ -166,12 +168,12 @@
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
-      buttonTransformEfftctImage.removeEventListener('mousemove', onMouseMove);
-      buttonTransformEfftctImage.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
     };
 
-    buttonTransformEfftctImage.addEventListener('mousemove', onMouseMove);
-    buttonTransformEfftctImage.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   });
 
   // ---- Конец захвата и перетаскивания слайдера
