@@ -16,6 +16,7 @@
   var buttonRegulationEffectPlus = iconPercentBigPicture.querySelector('.scale__control--bigger');
   var numberIconPercentBigPicture = iconPercentBigPicture.querySelector('input[name="scale"]');
   var iconSliderBigPicture = bigPicture.querySelector('.img-upload__effect-level');
+  var effectLevelSliderValue = iconSliderBigPicture.querySelector('.effect-level__value');
 
   var filterName;
   var scaleFoto = 1;
@@ -31,12 +32,18 @@
     effectLevelDepth.style.width = '100%';
     numberIconPercentBigPicture.value = '100%';
     ingBigPopap.style.transform = 'scale(' + 1 + ')';
+    effectLevelSliderValue.value = 100;
+    popapImgUploadPreview.style.filter = null;
   };
+
+  window.buttonTransformEffectImagePosition = buttonTransformEffectImagePosition;
 
   var clickFotoEffectFirst = function () {
     iconPercentBigPicture.classList.add('hidden');
     iconSliderBigPicture.classList.add('hidden');
   };
+
+  window.clickFotoEffectFirst = clickFotoEffectFirst;
 
   // ----- Выбираем эффект для фотки
 
@@ -143,6 +150,7 @@
           buttonTransformEfftctImage.style.left = (buttonTransformEfftctImage.offsetLeft - shift.x) + 'px';
           effectLevelDepth.style.width = Math.floor((buttonTransformEfftctImage.offsetLeft - shift.x) / (453 / 100)) + '%';
           var percentEffectFoto = Math.floor((buttonTransformEfftctImage.offsetLeft - shift.x) / (453 / 100));
+          effectLevelSliderValue.value = percentEffectFoto;
 
           if (filterName === 'grayscale') {
             popapImgUploadPreview.style.filter = 'grayscale(' + ((1 / 100) * (percentEffectFoto)) + ')';
@@ -166,12 +174,12 @@
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
-      buttonTransformEfftctImage.removeEventListener('mousemove', onMouseMove);
-      buttonTransformEfftctImage.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
     };
 
-    buttonTransformEfftctImage.addEventListener('mousemove', onMouseMove);
-    buttonTransformEfftctImage.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
   });
 
   // ---- Конец захвата и перетаскивания слайдера

@@ -54,10 +54,10 @@
     var cloneArrayHashtags = function () {
       var option = true;
       for (var c = 1; c < arr2.length; c++) {
-        var re = /(\w+)\s/;
+        var re = /([A-Za-zА-ЯЁа-яё0-9_]+)\s/;
         var element1 = arr2[c].replace(re, '$1');
         for (var d = c + 1; d < arr2.length; d++) {
-          var ree = /(\w+)\s?/;
+          var ree = /([A-Za-zА-ЯЁа-яё0-9_]+)\s?/;
           var element2 = arr2[d].replace(ree, '$1');
           if (element1.toLowerCase() === element2.toLowerCase()) {
             option = false;
@@ -68,17 +68,17 @@
       return option;
     };
 
-    if (!input.value.match(/^#\w+/g)) {
+    if (!input.value.match(/^#[A-Za-zА-ЯЁа-яё0-9_]+/g)) {
       input.setCustomValidity('В начале хеш-тега должна стаять - # или не хватает символа');
     } else {
       if (countingSymbols(/#/g).length === 1) {
         if (!input.value.match(/^#/g)) {
           input.setCustomValidity('В начале хеш-тега должно стаять - #');
-        } else if (!input.value.match(/^#\w+/g)) {
+        } else if (!input.value.match(/^#[A-Za-zА-ЯЁа-яё0-9_]+/g)) {
           input.setCustomValidity('Хеш-тег меньше двух символов');
-        } else if (input.value.match(/\w+\s\w+/g)) {
+        } else if (input.value.match(/[A-Za-zА-ЯЁа-яё0-9_]+\s[A-Za-zА-ЯЁа-яё0-9_]+/g)) {
           input.setCustomValidity('Хеш-тег не может содержать пробелов');
-        } else if (countingSymbols(/\w/g).length > 20) {
+        } else if (countingSymbols(/[A-Za-zА-ЯЁа-яё0-9_]/g).length > 20) {
           input.setCustomValidity('Хеш-тег не может быть длиннее 20 символов.');
         } else {
           input.setCustomValidity('');
@@ -86,13 +86,13 @@
       } else {
         if (input.value.match(/##/g)) {
           input.setCustomValidity('Разделите ##');
-        } else if (input.value.match(/\w+#/g)) {
+        } else if (input.value.match(/[A-Za-zА-ЯЁа-яё0-9_]+#/g)) {
           input.setCustomValidity('Хеш-теги не разделены пробелами');
         } else if (countingSymbols(/#/g).length > 5) {
           input.setCustomValidity('Хеш-тегов не может быть больше пяти.');
-        } else if (shortArrayHashtags(/(\w+)/g) === false) {
+        } else if (shortArrayHashtags(/([A-Za-zА-ЯЁа-яё0-9_]+)/g) === false) {
           input.setCustomValidity('Хеш-тег не может состоять из одной #');
-        } else if (spaceInHashtags(/(\s\w)(?:\s$)?/g) === false) {
+        } else if (spaceInHashtags(/(\s[A-Za-zА-ЯЁа-яё0-9_])(?:\s$)?/g) === false) {
           input.setCustomValidity('В хеш-теге пробел недопустим.');
         } else if (longArrayHashtags(19) === false) {
           input.setCustomValidity('Хеш-тег не может состоять больше 20 символов.');
