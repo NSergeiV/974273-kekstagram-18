@@ -17,12 +17,5 @@
     window.galleryPhotos.appendChild(fragment);
   };
 
-  var errorHandler = function (errorMessage) {
-    var blockMain = document.querySelector('main');
-    var templateError = document.querySelector('#error').content.querySelector('.error');
-    templateError.querySelector('.error__title').textContent = errorMessage;
-    blockMain.appendChild(templateError.cloneNode(true));
-  };
-
-  window.backend.load(creatingCopies, errorHandler); // Зопуск функции запроса данных с сервера
+  window.backend.load(creatingCopies, window. errorHandler); // Зопуск функции запроса данных с сервера
 })();

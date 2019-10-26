@@ -27,6 +27,9 @@
 
   var onImageEditingFormClose = function () {
     imageEditingForm.classList.add('hidden');
+    window.buttonTransformEffectImagePosition();
+    form.reset();
+    window.clickFotoEffectFirst();
     document.removeEventListener('keydown', onImageEditingFormCloseEsc);
     document.querySelector('input[name="filename"]').value = null;
   };
@@ -42,4 +45,14 @@
   iconFotoDownload.addEventListener('change', onImageEditingFormOpen);
   imageEditingFormButtonClose.addEventListener('click', onImageEditingFormClose);
   document.addEventListener('keydown', onHashTagsFoImageFocusNotSubmit, false);
+
+  // Отправка формы редоктирования фото на сервер
+  var form = document.querySelector('.img-upload__form');
+  form.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(form), function () {
+      onImageEditingFormClose();
+      window.successfulSubmission();
+    }, window.errorHandler);
+    evt.preventDefault();
+  });
 })();
